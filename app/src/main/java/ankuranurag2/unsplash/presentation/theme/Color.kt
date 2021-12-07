@@ -1,4 +1,4 @@
-package ankuranurag2.unsplash.ui.theme
+package ankuranurag2.unsplash.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
