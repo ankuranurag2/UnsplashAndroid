@@ -7,7 +7,7 @@ import retrofit2.http.Query
 interface UnsplashApi {
 
     @GET("/photos/")
-    suspend fun getWordInfo(
+    suspend fun getUnsplashImages(
         @Query("client_id") accessKey: String,
         @Query("page") page: Int,
     ): List<ImageDto>
