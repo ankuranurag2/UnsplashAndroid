@@ -11,8 +11,8 @@ class GetImagesUseCase @Inject constructor(
     private val repository: UnsplashImageRepository
 ) {
 
-    operator fun invoke(params: Param): Flow<Resource<List<ImageData>>> = flow {
-        repository.getImages(params.accessKey, params.pageNum)
+    operator fun invoke(params: Param): Flow<Resource<List<ImageData>>> {
+       return repository.getImages(params.accessKey, params.pageNum)
     }
 
     data class Param(

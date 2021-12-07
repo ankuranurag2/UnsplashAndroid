@@ -1,7 +1,5 @@
 package ankuranurag2.unsplash.presentation.popular
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ankuranurag2.unsplash.data.models.ImageData
@@ -9,7 +7,7 @@ import ankuranurag2.unsplash.domain.usecases.GetImagesUseCase
 import ankuranurag2.unsplash.domain.usecases.GetKeyUseCase
 import ankuranurag2.unsplash.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,31 +19,25 @@ class MainViewModel @Inject constructor(
 
     private var pageNum = 1
 
-    private val _uiState = mutableStateOf(UiState())
-    val uiState: State<UiState> get() = _uiState
+    private val _uiState = MutableStateFlow<UiState>(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    init {
+        fetchPopularImages()
+    }
 
     fun fetchPopularImages() {
         viewModelScope.launch {
-            getImagesUseCase.invoke(GetImagesUseCase.Param(getKeyUseCase(), pageNum++))
+            getImagesUseCase(GetImagesUseCase.Param(getKeyUseCase(), pageNum++))
                 .collect { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            _uiState.value = uiState.value.copy(
-                                imageList = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                        is Resource.Error -> {
-                            _uiState.value = uiState.value.copy(
-                                imageList = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                        is Resource.Loading -> {
-                            _uiState.value = uiState.value.copy(
-                                imageList = result.data ?: emptyList(),
-                                isLoading = true
-                            )
+                    _uiState.update {
+                        when (result) {
+                            is Resource.Success ->
+                                it.copy(imageList = result.data ?: emptyList(), isLoading = false)
+                            is Resource.Error ->
+                                it.copy(imageList = result.data ?: emptyList(), isLoading = false)
+                            is Resource.Loading ->
+                                it.copy(imageList = result.data ?: emptyList(), isLoading = true)
                         }
                     }
                 }

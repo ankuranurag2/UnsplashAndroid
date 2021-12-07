@@ -14,7 +14,7 @@ class UnsplashImageRepositoryImpl @Inject constructor(
     private val api: UnsplashApi
 ) : UnsplashImageRepository {
 
-    override suspend fun getImages(accessKey: String, pageNum: Int)
+    override fun getImages(accessKey: String, pageNum: Int)
             : Flow<Resource<List<ImageData>>> = flow {
 
         emit(Resource.Loading<List<ImageData>>())

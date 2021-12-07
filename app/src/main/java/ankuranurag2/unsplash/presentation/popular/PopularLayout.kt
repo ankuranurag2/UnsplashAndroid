@@ -2,7 +2,11 @@ package ankuranurag2.unsplash.presentation.popular
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -10,7 +14,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ankuranurag2.unsplash.R
@@ -23,14 +30,26 @@ import coil.size.Scale
 @Composable
 fun PopularRootLayout() {
     val viewModel: MainViewModel = hiltViewModel()
-    val uiState = viewModel.uiState.value
+    val uiState = viewModel.uiState.collectAsState()
 
-    LazyVerticalGrid(
-        cells = GridCells.Fixed(3),
-        state = rememberLazyListState()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.Cyan),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(uiState.imageList) {
-            ImageItem(imageData = it)
+        LazyVerticalGrid(
+            cells = GridCells.Fixed(3),
+            state = rememberLazyListState(),
+            contentPadding = PaddingValues(8.dp, 8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+                .background(Color.Green)
+        ) {
+            items(uiState.value.imageList) {
+                ImageItem(imageData = it)
+            }
         }
     }
 }
@@ -40,10 +59,11 @@ fun PopularRootLayout() {
 fun ImageItem(
     imageData: ImageData
 ) {
-    Card(
-        elevation = 4.dp,
-        onClick = {}
-    ) {
+//    Card(
+//        elevation = 4.dp,
+//        onClick = {},
+//        modifier = Modifier.fillMaxSize().background(Color.Red)
+//    ) {
         Image(
             painter = rememberImagePainter(
                 data = imageData.urls.full,
@@ -55,7 +75,9 @@ fun ImageItem(
                 }
             ),
             contentDescription = null,
-            Modifier.aspectRatio(1f, true)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Yellow)
         )
-    }
+//    }
 }

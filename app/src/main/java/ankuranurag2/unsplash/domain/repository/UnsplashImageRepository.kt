@@ -5,5 +5,5 @@ import ankuranurag2.unsplash.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface UnsplashImageRepository {
-    suspend fun getImages(accessKey: String, pageNum: Int): Flow<Resource<List<ImageData>>>
+    fun getImages(accessKey: String, pageNum: Int): Flow<Resource<List<ImageData>>>
 }
