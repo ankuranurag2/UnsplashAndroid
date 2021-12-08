@@ -47,5 +47,5 @@ data class ImageDto(
      * Method to get needful {@link ImageData} from bulky {@link ImageDto} class.
      */
     fun toImageData() =
-        ImageData(id, urls.regular ?: "")
+        ImageData(urls.regular ?: "")
 }
