@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import ankuranurag2.unsplash.presentation.theme.UnsplashDemoTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.InternalCoroutinesApi
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @InternalCoroutinesApi
     @ExperimentalFoundationApi
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {

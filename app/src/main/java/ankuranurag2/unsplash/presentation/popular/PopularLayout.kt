@@ -45,7 +45,7 @@ fun PopularRootLayout() {
             val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
 
             //Make the fetch call before last 2 items are visible
-            lastVisibleItemIndex > (totalItemsNumber - 2)
+            lastVisibleItemIndex > (totalItemsNumber - 4)
         }
     }
 
@@ -103,7 +103,7 @@ fun ImageItem(
     ) {
         Image(
             painter = rememberImagePainter(
-                data = imageData.urls.regular,
+                data = imageData.url,
                 builder = {
                     crossfade(true)
                     placeholder(R.drawable.ic_loading)
