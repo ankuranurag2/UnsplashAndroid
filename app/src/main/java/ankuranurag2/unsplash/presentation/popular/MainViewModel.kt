@@ -27,6 +27,9 @@ class MainViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private val _eventFlow = MutableSharedFlow<UIEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     init {
         fetchPopularImages()
     }
@@ -41,8 +44,12 @@ class MainViewModel @Inject constructor(
                                 imageDataList.addAll(result.data ?: emptyList())
                                 it.copy(imageList = imageDataList, isLoading = false, errorMessage = null)
                             }
-                            is Resource.Error ->
+                            is Resource.Error ->{
+                                _eventFlow.emit(UIEvent.ShowSnackbar(
+                                    result.message ?: "Unknown error"
+                                ))
                                 it.copy(imageList = imageDataList, isLoading = false, errorMessage = result.message)
+                            }
                             is Resource.Loading ->
                                 it.copy(imageList = imageDataList, isLoading = true, errorMessage = null)
                         }
@@ -57,3 +64,7 @@ data class UiState(
     val imageList: List<ImageData> = emptyList(),
     val errorMessage: String? = null
 )
+
+sealed class UIEvent {
+    data class ShowSnackbar(val message: String): UIEvent()
+}

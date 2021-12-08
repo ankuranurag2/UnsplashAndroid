@@ -23,8 +23,8 @@ import ankuranurag2.unsplash.data.models.ImageData
 import coil.compose.rememberImagePainter
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
 @ExperimentalMaterialApi
@@ -35,7 +35,6 @@ fun PopularRootLayout() {
     val uiState by viewModel.uiState.collectAsState()
 
     val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
     val loadMore = remember {
@@ -53,6 +52,18 @@ fun PopularRootLayout() {
         snapshotFlow { loadMore.value }
             .distinctUntilChanged()
             .collect { viewModel.fetchPopularImages() }
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is UIEvent.ShowSnackbar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+            }
+        }
     }
 
     Scaffold(scaffoldState = scaffoldState) {
@@ -78,12 +89,6 @@ fun PopularRootLayout() {
             }
             if (uiState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.wrapContentSize())
-            }
-
-            uiState.errorMessage?.let {
-                coroutineScope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar(message = it)
-                }
             }
         }
     }
