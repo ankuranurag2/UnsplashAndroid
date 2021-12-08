@@ -10,6 +10,7 @@ interface UnsplashApi {
     suspend fun getUnsplashImages(
         @Query("client_id") accessKey: String,
         @Query("page") page: Int,
+        @Query("per_page") perPage: Int = 20,
     ): List<ImageDto>
 
     companion object {
