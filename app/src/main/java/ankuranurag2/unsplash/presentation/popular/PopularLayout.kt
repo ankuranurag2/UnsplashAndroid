@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,8 +21,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ankuranurag2.unsplash.R
 import ankuranurag2.unsplash.data.models.ImageData
 import coil.compose.rememberImagePainter
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+@InternalCoroutinesApi
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
@@ -35,6 +36,24 @@ fun PopularRootLayout() {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
+    val loadMore = remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItemsNumber = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+
+            //Make the fetch call before last 2 items are visible
+            lastVisibleItemIndex > (totalItemsNumber - 2)
+        }
+    }
+
+    LaunchedEffect(loadMore) {
+        snapshotFlow { loadMore.value }
+            .distinctUntilChanged()
+            .collect { viewModel.fetchPopularImages() }
+    }
 
     Scaffold(scaffoldState = scaffoldState) {
         Column(
@@ -46,8 +65,8 @@ fun PopularRootLayout() {
             if (uiState.imageList.isNotEmpty()) {
                 LazyVerticalGrid(
                     cells = GridCells.Fixed(2),
-                    state = rememberLazyListState(),
-                    contentPadding = PaddingValues(8.dp, 8.dp),
+                    state = listState,
+                    contentPadding = PaddingValues(4.dp, 4.dp),
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f)
@@ -84,7 +103,7 @@ fun ImageItem(
     ) {
         Image(
             painter = rememberImagePainter(
-                data = imageData.urls.full,
+                data = imageData.urls.regular,
                 builder = {
                     crossfade(true)
                     placeholder(R.drawable.ic_loading)
@@ -96,7 +115,7 @@ fun ImageItem(
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
                 .aspectRatio(1f)
-                .background(Color.Yellow)
+                .background(Color.Gray)
         )
     }
 }
