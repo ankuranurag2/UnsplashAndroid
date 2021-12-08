@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.HttpURLConnection
 import javax.inject.Inject
 
 class UnsplashImageRepositoryImpl @Inject constructor(
@@ -23,7 +24,10 @@ class UnsplashImageRepositoryImpl @Inject constructor(
             val imageList = api.getUnsplashImages(accessKey, pageNum)
             emit(Resource.Success<List<ImageData>>(data = imageList.map { it.toImageData() }))
         } catch (e: HttpException) {
-            emit(Resource.Error<List<ImageData>>("Oops, Something went wrong!"))
+            if (e.response()?.code()==HttpURLConnection.HTTP_UNAUTHORIZED)
+                emit(Resource.Error<List<ImageData>>("Check your API Key"))
+            else
+                emit(Resource.Error<List<ImageData>>("Oops, Something went wrong!"))
         } catch (e: IOException) {
             emit(Resource.Error<List<ImageData>>("Please check you internet connection!"))
         }

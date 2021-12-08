@@ -19,6 +19,8 @@ class MainViewModel @Inject constructor(
 
     private var pageNum = 1
 
+    private val imageDataList = ArrayList<ImageData>()
+
     private val _uiState = MutableStateFlow<UiState>(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
@@ -32,12 +34,14 @@ class MainViewModel @Inject constructor(
                 .collect { result ->
                     _uiState.update {
                         when (result) {
-                            is Resource.Success ->
-                                it.copy(imageList = result.data ?: emptyList(), isLoading = false)
+                            is Resource.Success -> {
+                                imageDataList.addAll(result.data ?: emptyList())
+                                it.copy(imageList = imageDataList, isLoading = false, errorMessage = null)
+                            }
                             is Resource.Error ->
-                                it.copy(imageList = result.data ?: emptyList(), isLoading = false)
+                                it.copy(imageList = imageDataList, isLoading = false, errorMessage = result.message)
                             is Resource.Loading ->
-                                it.copy(imageList = result.data ?: emptyList(), isLoading = true)
+                                it.copy(imageList = imageDataList, isLoading = true, errorMessage = null)
                         }
                     }
                 }
@@ -47,5 +51,6 @@ class MainViewModel @Inject constructor(
 
 data class UiState(
     val isLoading: Boolean = true,
-    val imageList: List<ImageData> = emptyList()
+    val imageList: List<ImageData> = emptyList(),
+    val errorMessage: String? = null
 )
