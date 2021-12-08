@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import ankuranurag2.unsplash.data.models.ImageData
 import ankuranurag2.unsplash.domain.usecases.GetImagesUseCase
 import ankuranurag2.unsplash.domain.usecases.GetKeyUseCase
+import ankuranurag2.unsplash.utils.AppDispatcherProvider
+import ankuranurag2.unsplash.utils.DispatcherProvider
 import ankuranurag2.unsplash.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -14,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getKeyUseCase: GetKeyUseCase,
-    private val getImagesUseCase: GetImagesUseCase
+    private val getImagesUseCase: GetImagesUseCase,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private var pageNum = 1
@@ -29,7 +32,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun fetchPopularImages() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io) {
             getImagesUseCase(GetImagesUseCase.Param(getKeyUseCase(), pageNum++))
                 .collect { result ->
                     _uiState.update {

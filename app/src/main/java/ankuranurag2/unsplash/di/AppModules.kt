@@ -8,6 +8,8 @@ import ankuranurag2.unsplash.data.repository.AccessKeyRepositoryImpl
 import ankuranurag2.unsplash.data.repository.UnsplashImageRepositoryImpl
 import ankuranurag2.unsplash.domain.repository.AccessKeyRepository
 import ankuranurag2.unsplash.domain.repository.UnsplashImageRepository
+import ankuranurag2.unsplash.utils.AppDispatcherProvider
+import ankuranurag2.unsplash.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,5 +50,11 @@ class AppModules {
         return Room
             .databaseBuilder(app, ImageDatabase::class.java, "img_db")
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideDispatcherProvider(): DispatcherProvider {
+        return AppDispatcherProvider()
     }
 }
